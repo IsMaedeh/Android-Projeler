@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -24,13 +25,16 @@ import androidx.core.view.WindowInsetsCompat;
 import android.Manifest;
 
 //import com.example.imageclassify.MobilenetV110224Quant;
-import com.example.imageclassify.ml.MobilenetV110224Quant;
+//import com.example.imageclassify.ml.MobilenetV110224Quant;
+import com.example.imageclassify.ml.ModelUnquant;
 import com.example.imageclassify.ml.TurkLirasimodeli;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 
 import org.tensorflow.lite.DataType;
+import org.tensorflow.lite.Interpreter;
+import org.tensorflow.lite.Tensor;
 import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.support.model.Model;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
@@ -41,6 +45,7 @@ import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -61,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
         List<String> labels = new ArrayList<>();
         try {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(getAssets().open("labels.txt")));
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(getAssets().open("labelsPara.txt")));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 labels.add(line);
@@ -125,81 +130,104 @@ public class MainActivity extends AppCompatActivity {
 //                    // TODO Handle the exception
 //                }
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                try {
-//                    // **Interpreter seçeneklerini belirleyelim**
-//                    Model.Options options = new Model.Options.Builder()
-//                            .setDevice(Model.Device.NNAPI)  // NNAPI kullan
-//                            .setNumThreads(4)
-//                            .build();
-
-
-                    // **Modeli yüklerken ayarları iletelim**
-                    TurkLirasimodeli model = TurkLirasimodeli.newInstance(MainActivity.this);
-
-                    // **Giriş verisini hazırla**
-                    TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 30, 30, 3}, DataType.FLOAT32);
-                    bitmap = Bitmap.createScaledBitmap(bitmap, 30, 30, true);
-                    inputFeature0.loadBuffer(convertBitmapToByteBuffer(bitmap));
-
-                    // **Modeli çalıştır ve tahmini al**
-                    TurkLirasimodeli.Outputs outputs = model.process(inputFeature0);
-                    TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
-
-                    // **En yüksek olasılığa sahip tahmini al**
-                    int predictedIndex = getMax(outputFeature0.getFloatArray());
-                    result.setText(labelsArray[predictedIndex] + " ");
-
-                    // **Modeli kapat (Kaynakları serbest bırak)**
-                    model.close();
-                } catch (IOException e) {
-                    e.printStackTrace();  // Hata varsa log'a yaz
-                }
+//                try {
+////                    // **Interpreter seçeneklerini belirleyelim**
+////                    Model.Options options = new Model.Options.Builder()
+////                            .setDevice(Model.Device.NNAPI)  // NNAPI kullan
+////                            .setNumThreads(4)
+////                            .build();
+//
+//
+//                    // **Modeli yüklerken ayarları iletelim**
+//                    TurkLirasimodeli model = TurkLirasimodeli.newInstance(MainActivity.this);
+//
+//                    // **Giriş verisini hazırla**
+//                    TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 30, 30, 3}, DataType.FLOAT32);
+//                    bitmap = Bitmap.createScaledBitmap(bitmap, 30, 30, true);
+//                    inputFeature0.loadBuffer(convertBitmapToByteBuffer(bitmap));
+//
+//                    // **Modeli çalıştır ve tahmini al**
+//                    TurkLirasimodeli.Outputs outputs = model.process(inputFeature0);
+//                    TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
+//
+//                    // **En yüksek olasılığa sahip tahmini al**
+//                    int predictedIndex = getMax(outputFeature0.getFloatArray());
+//                    result.setText(labelsArray[predictedIndex] + " ");
+//
+//                    // **Modeli kapat (Kaynakları serbest bırak)**
+//                    model.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();  // Hata varsa log'a yaz
+//                }
 
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                try {
+
+                    ModelUnquant model = ModelUnquant.newInstance(MainActivity.this);
+
+                    // Creates inputs for reference.
+                    TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 224, 224, 3}, DataType.UINT8);
+                    bitmap = Bitmap.createScaledBitmap(bitmap, 224, 224, true);
+                    inputFeature0.loadBuffer(TensorImage.fromBitmap(bitmap).getBuffer());
+
+
+
+                    // Runs model inference and gets result.
+                    ModelUnquant.Outputs outputs = model.process(inputFeature0);
+                    TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
+
+                    result.setText(labelsArray[getMax(outputFeature0.getFloatArray())] + " ");
+                    // Releases model resources if no longer used.
+                    model.close();
+                } catch (IOException e) {
+                    // TODO Handle the exception
+
+                }
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             }
         });
     }
 
 
     //private
-    ByteBuffer convertBitmapToByteBuffer(Bitmap bitmap) {
-        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * 30 * 30 * 3);
-        byteBuffer.order(ByteOrder.nativeOrder());
-
-        int[] intValues = new int[30*30];
-
-        for (int pixelValue : intValues) {
-            float r = ((pixelValue >> 16) & 0xFF) / 255.0f; // Normalize
-            float g = ((pixelValue >> 8) & 0xFF) / 255.0f;
-            float b = (pixelValue & 0xFF) / 255.0f;
-            byteBuffer.putFloat(r);
-            byteBuffer.putFloat(g);
-            byteBuffer.putFloat(b);
-        }
-        return byteBuffer;
-    }
+//    ByteBuffer convertBitmapToByteBuffer(Bitmap bitmap) {
+//        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * 30 * 30 * 3);
+//        byteBuffer.order(ByteOrder.nativeOrder());
+//
+//        int[] intValues = new int[30*30];
+//
+//        for (int pixelValue : intValues) {
+//            float r = ((pixelValue >> 16) & 0xFF) / 255.0f; // Normalize
+//            float g = ((pixelValue >> 8) & 0xFF) / 255.0f;
+//            float b = (pixelValue & 0xFF) / 255.0f;
+//            byteBuffer.putFloat(r);
+//            byteBuffer.putFloat(g);
+//            byteBuffer.putFloat(b);
+//        }
+//        return byteBuffer;
+//    }
 
     //private
-    int getMax(float[] arr) {
-        int maxIndex = 0;
-        float maxValue = arr[0];
-
-        for (int i = 1; i < arr.length; i++) {
-            if (arr[i] > maxValue) {
-                maxValue = arr[i];
-                maxIndex = i;
-            }
-        }
-        return  maxIndex;
-    }
-
 //    int getMax(float[] arr) {
-//        int max = 0;
-//        for (int i = 0; i < arr.length; i++) {
-//            if (arr[i] > arr[max]) max = i;
+//        int maxIndex = 0;
+//        float maxValue = arr[0];
+//
+//        for (int i = 1; i < arr.length; i++) {
+//            if (arr[i] > maxValue) {
+//                maxValue = arr[i];
+//                maxIndex = i;
+//            }
 //        }
-//        return max;
+//        return  maxIndex;
 //    }
+
+    int getMax(float[] arr) {
+        int max = 0;
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] > arr[max]) max = i;
+        }
+        return max;
+    }
 
     void getPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
