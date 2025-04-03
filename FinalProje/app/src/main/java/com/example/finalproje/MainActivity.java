@@ -23,8 +23,11 @@ import androidx.core.view.WindowInsetsCompat;
 
 import android.Manifest;
 
+import com.example.finalproje.ml.ModelFruits;
 import com.example.finalproje.ml.ModelUnquant;
 import com.example.finalproje.ml.ModelUnquant2;
+import com.example.finalproje.ml.TurkLirasimodeli;
+import com.example.finalproje.ml.TurkisLiraModel2;
 
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.metadata.schema.ImageSize;
@@ -42,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     Button picture, camera, gallery;
 
     int imageSize = 224;
+//    int imageSize = 32;
 
 
     @Override
@@ -79,6 +83,10 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("DefaultLocale")
     public  void classifyImage(Bitmap image) {
         try {
+//            ModelFruits
+//            ModelUnquant2
+//            TurkLirasimodeli
+//              TurkisLiraModel2
             ModelUnquant2 model = ModelUnquant2.newInstance(getApplicationContext());
 
             // Creates inputs for reference.
@@ -113,7 +121,8 @@ public class MainActivity extends AppCompatActivity {
                     maxPos = i;
                 }
             }
-            String[] classes = {"5", "10", "20", "50", "100", "200"};
+            String[] classes = {"5 lira", "10 lira", "20 lira", "50 lira", "100 lira", "200 lira"};
+//            String[] classes = {"apple", "banana", "orange"};
 
             result.setText(classes[maxPos]);
 
