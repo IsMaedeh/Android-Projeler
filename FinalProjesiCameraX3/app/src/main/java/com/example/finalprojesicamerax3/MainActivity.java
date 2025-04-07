@@ -1,6 +1,7 @@
  package com.example.finalprojesicamerax3;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     GestureDetector gestureDetector;
 
 
-    Button btnClickPhoto, btnOpenCamera;
+    Button btnClickPhoto, btnGallery;
     TextureView textureView;
 
     private PermissionManager permissionManager;
@@ -116,7 +117,16 @@ public class MainActivity extends AppCompatActivity {
         });
 
         btnClickPhoto = findViewById(R.id.btnClickPhoto);
-        btnOpenCamera = findViewById(R.id.btnOpenCamera);
+        btnGallery = findViewById(R.id.btnGallery);
+
+        // MainActivity.java to Gallery
+        btnGallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, Gallery.class);
+                startActivity(intent);
+            }
+        });
 
         permissionManager = PermissionManager.getInstance(this);
         textureView = findViewById(R.id.textureViewID );
