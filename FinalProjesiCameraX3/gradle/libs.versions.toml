@@ -11,6 +11,12 @@ camerax = "1.0.0-alpha02"
 googleGmsGoogleServices = "4.4.2"
 firebaseDatabase = "21.0.0"
 
+tensorflowLite = "2.9.0"
+tensorflowLiteTaskVision = "0.4.0"
+tensorflowLiteSupport = "0.4.0"
+tensorflowLiteMetadata = "0.4.0"
+
+
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -23,6 +29,13 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "camerax" }
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camerax" }
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
+
+tensorflow-lite = { group = "org.tensorflow", name = "tensorflow-lite", version.ref = "tensorflowLite" }
+tensorflow-lite-task-vision = { group = "org.tensorflow", name = "tensorflow-lite-task-vision", version.ref = "tensorflowLiteTaskVision" }
+tensorflow-lite-support = { group = "org.tensorflow", name = "tensorflow-lite-support", version.ref = "tensorflowLiteSupport" }
+tensorflow-lite-metadata = { group = "org.tensorflow", name = "tensorflow-lite-metadata", version.ref = "tensorflowLiteMetadata" }
+
+#glide = { module = "com.github.bumptech.glide:glide", version = "4.15.1" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -1,7 +1,8 @@
- package com.example.finalprojesicamerax3;
+package com.example.finalprojesicamerax3;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -42,13 +43,35 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.Toast;
+
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import android.Manifest;
 
-public class MainActivity extends AppCompatActivity {
+//import com.example.finalprojesicamerax3.ml.ModelUnquant;
+import com.example.finalprojesicamerax3.ml.ModelUnquant;
+import com.example.finalprojesicamerax3.ml.ModelUnquant2;
+
+import org.tensorflow.lite.DataType;
+import org.tensorflow.lite.support.image.TensorImage;
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
+
+ public class MainActivity extends AppCompatActivity {
+
+//    //Prediction
+    Bitmap image;
+    String predResult = "Buradayim";
+    int imageSize = 224;
+//    String[] labelsArray;
 
     // TTS
 //    Button button;
@@ -58,7 +81,8 @@ public class MainActivity extends AppCompatActivity {
     GestureDetector gestureDetector;
 
 
-    Button btnClickPhoto, btnGallery;
+//    Button btnClickPhoto;
+    Button btnGallery;
     TextureView textureView;
 
     private PermissionManager permissionManager;
@@ -111,12 +135,16 @@ public class MainActivity extends AppCompatActivity {
         gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
            @Override
            public boolean onDoubleTap(MotionEvent e) {
-               speakText();
+
+               clickPhoto();
+
+               // Saying result
+               speakText(predResult);
                return true;
            }
         });
 
-        btnClickPhoto = findViewById(R.id.btnClickPhoto);
+//        btnClickPhoto = findViewById(R.id.btnClickPhoto);
         btnGallery = findViewById(R.id.btnGallery);
 
         // MainActivity.java to Gallery
@@ -141,21 +169,87 @@ public class MainActivity extends AppCompatActivity {
             openCamera();
         }
 
-        btnClickPhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) { clickPhoto(); }
-        });
+//        btnClickPhoto.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                //clickPhoto();
+//                }
+//        });
     }
 
-    // TTS
+    // Prediction : model
+    @SuppressLint("DefaultLocale")
+    public  void classifyImage(Bitmap image) {
+        try {
+//            ModelFruits
+//            ModelUnquant2
+//            TurkLirasimodeli
+//              TurkisLiraModel2
+            ModelUnquant2 model = ModelUnquant2.newInstance(getApplicationContext());
+
+            // Creates inputs for reference.
+            TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, imageSize, imageSize, 3}, DataType.FLOAT32);
+            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * imageSize * imageSize * 3);
+            byteBuffer.order(ByteOrder.nativeOrder());
+
+            int [] intValues = new int[imageSize * imageSize];
+            image.getPixels(intValues, 0, image.getWidth(), 0, 0, image.getWidth(), image.getHeight());
+            int pixel = 0;
+            for (int i = 0; i < imageSize; i++) {
+                for (int j = 0; j < imageSize; j++) {
+                    int val = intValues[pixel++]; //RGB
+                    byteBuffer.putFloat(((val >> 16) & 0xFF) * (1.f / 255.f));
+                    byteBuffer.putFloat(((val >> 8) & 0xFF) * (1.f / 255.f));
+                    byteBuffer.putFloat((val & 0xFF) * (1.f / 255.f));
+                }
+            }
+
+            inputFeature0.loadBuffer(byteBuffer);
+
+            // Runs model inference and gets result.
+            ModelUnquant2.Outputs outputs = model.process(inputFeature0);
+            TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
+
+            float[] confidences = outputFeature0.getFloatArray();
+            int maxPos = 0;
+            float maxConfidence = 0;
+            for (int i = 0; i < confidences.length; i++){
+                if (confidences[i] > maxConfidence) {
+                    maxConfidence = confidences[i];
+                    maxPos = i;
+                }
+            }
+            String[] classes = {"5 lira", "10 lira", "20 lira", "50 lira", "100 lira", "200 lira"};
+//            String[] classes = {"apple", "banana", "orange"};
+
+            predResult = classes[maxPos];
+
+            StringBuilder s = new StringBuilder();
+            for (int i = 0; i < classes.length; i++) {
+                s.append(String.format("%s: %.1f%%\n", classes[i], confidences[i] * 100));
+
+            }
+
+//            confidence.setText(s.toString());
+
+            // Releases model resources if no longer used.
+            model.close();
+        } catch (IOException e) {
+            // TODO Handle the exception
+        }
+
+    }
+
+
+     // TTS
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         return gestureDetector.onTouchEvent(event) || super.onTouchEvent(event);
     }
 
     // TTS Function to read text aloud
-    private  void speakText() {
-        String data = "iki kere sayfaya bastiniz";
+    private  void speakText(String data) {
+//        String data = "iki kere sayfaya bastiniz";
 //        float speed = (float) seekBar.getProgress() / 50;
 //        if (speed < 0.1) speed = 0.1f;
 //
@@ -172,6 +266,7 @@ public class MainActivity extends AppCompatActivity {
         }
         super.onDestroy();
     }
+
 
     @Override public  void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                                       @NonNull int[] grantResults) {
@@ -269,9 +364,20 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onImageSaved(@NonNull File file) {
                 String msg = "Pic captured at " + file.getAbsolutePath();
-//                Bitmap bitmap = BitmapFactory.decodeFile(file.getPath());
-                Toast.makeText(getBaseContext(), msg, Toast.LENGTH_LONG).show();
-                addImageToGallery(file.getPath(), MainActivity.this);
+                // Decode and display the bitmap
+                image = BitmapFactory.decodeFile(file.getPath());
+
+                // Prediction: Model
+                int dimension = Math.min(image.getWidth(), image.getHeight());
+                image = ThumbnailUtils.extractThumbnail(image, dimension, dimension);
+
+                image = Bitmap.createScaledBitmap(image, imageSize, imageSize, false);
+                classifyImage(image);
+
+
+
+                //Toast.makeText(getBaseContext(), msg, Toast.LENGTH_LONG).show();
+                //addImageToGallery(file.getPath(), MainActivity.this);
             }
 
             @Override
@@ -313,4 +419,5 @@ public class MainActivity extends AppCompatActivity {
         }
 //        context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
     }
+
 }

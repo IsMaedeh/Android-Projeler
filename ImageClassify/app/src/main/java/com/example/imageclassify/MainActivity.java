@@ -161,28 +161,29 @@ public class MainActivity extends AppCompatActivity {
 //                }
 
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                try {
-
-                    ModelUnquant model = ModelUnquant.newInstance(MainActivity.this);
-
-                    // Creates inputs for reference.
-                    TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 224, 224, 3}, DataType.UINT8);
-                    bitmap = Bitmap.createScaledBitmap(bitmap, 224, 224, true);
-                    inputFeature0.loadBuffer(TensorImage.fromBitmap(bitmap).getBuffer());
-
-
-
-                    // Runs model inference and gets result.
-                    ModelUnquant.Outputs outputs = model.process(inputFeature0);
-                    TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
-
-                    result.setText(labelsArray[getMax(outputFeature0.getFloatArray())] + " ");
-                    // Releases model resources if no longer used.
-                    model.close();
-                } catch (IOException e) {
-                    // TODO Handle the exception
-
-                }
+//                try {
+//
+//                    ModelUnquant model = ModelUnquant.newInstance(MainActivity.this);
+//
+//                    // Creates inputs for reference.
+//                    TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, 224, 224, 3}, DataType.UINT8);
+//                    bitmap = Bitmap.createScaledBitmap(bitmap, 224, 224, true);
+////                    inputFeature0.loadBuffer(convertBitmapToByteBuffer(bitmap));
+//                    inputFeature0.loadBuffer(TensorImage.fromBitmap(bitmap).getBuffer());
+//
+//
+//
+//                    // Runs model inference and gets result.
+//                    ModelUnquant.Outputs outputs = model.process(inputFeature0);
+//                    TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
+//
+//                    result.setText(labelsArray[getMax(outputFeature0.getFloatArray())] + " ");
+//                    // Releases model resources if no longer used.
+//                    model.close();
+//                } catch (IOException e) {
+//                    // TODO Handle the exception
+//
+//                }
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             }
         });
@@ -194,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
 //        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * 30 * 30 * 3);
 //        byteBuffer.order(ByteOrder.nativeOrder());
 //
-//        int[] intValues = new int[30*30];
+//        int[] intValues = new int[30 * 30];
 //
 //        for (int pixelValue : intValues) {
 //            float r = ((pixelValue >> 16) & 0xFF) / 255.0f; // Normalize
