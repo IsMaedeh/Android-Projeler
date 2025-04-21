@@ -75,7 +75,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
     // TTS
 //    Button button;
-    EditText editText;
+//    EditText editText;
 //    SeekBar seekBar;
     TextToSpeech textToSpeech;
     GestureDetector gestureDetector;
@@ -137,9 +137,6 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
            public boolean onDoubleTap(MotionEvent e) {
 
                clickPhoto();
-
-               // Saying result
-               speakText(predResult);
                return true;
            }
         });
@@ -185,7 +182,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 //            ModelUnquant2
 //            TurkLirasimodeli
 //              TurkisLiraModel2
-            ModelUnquant2 model = ModelUnquant2.newInstance(getApplicationContext());
+            ModelUnquant model = ModelUnquant.newInstance(getApplicationContext());
 
             // Creates inputs for reference.
             TensorBuffer inputFeature0 = TensorBuffer.createFixedSize(new int[]{1, imageSize, imageSize, 3}, DataType.FLOAT32);
@@ -207,7 +204,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
             inputFeature0.loadBuffer(byteBuffer);
 
             // Runs model inference and gets result.
-            ModelUnquant2.Outputs outputs = model.process(inputFeature0);
+            ModelUnquant.Outputs outputs = model.process(inputFeature0);
             TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
 
             float[] confidences = outputFeature0.getFloatArray();
@@ -268,7 +265,8 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
     }
 
 
-    @Override public  void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+    @Override
+    public  void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                                       @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 100) {
@@ -374,6 +372,8 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
                 image = Bitmap.createScaledBitmap(image, imageSize, imageSize, false);
                 classifyImage(image);
 
+                // Saying result
+                speakText(predResult);
 
 
                 //Toast.makeText(getBaseContext(), msg, Toast.LENGTH_LONG).show();

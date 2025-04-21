@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp"
+    android:background="#FFFFFF">
+
+    <Button
+        android:id="@+id/btnAccelerometer"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:text="Accelerometer Sensor"
+        android:backgroundTint="#6A1B9A"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/btnCompass"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:text="Compass Sensor"
+        android:backgroundTint="#6A1B9A"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/btnGyroscope"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:text="Gyroscope Sensor"
+        android:backgroundTint="#6A1B9A"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/btnHumidity"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:text="Humidity Sensor"
+        android:backgroundTint="#6A1B9A"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/btnLight"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:text="Light Sensor"
+        android:backgroundTint="#6A1B9A"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/btnMagnometer"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:text="Magnometer Sensor"
+        android:backgroundTint="#6A1B9A"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/btnPressure"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:text="Pressure Sensor"
+        android:backgroundTint="#6A1B9A"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/btnProximity"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:text="Proximity Sensor"
+        android:backgroundTint="#6A1B9A"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="12dp"/>
+
+    <Button
+        android:id="@+id/btnThermometer"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:text="Thermometer Sensor"
+        android:backgroundTint="#6A1B9A"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="12dp"/>
+
+</LinearLayout>

@@ -14,8 +14,6 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity {
 
     private long startTime = 0;
-    public int oran1 = 0, oran2 = 0, oran3 = 0;
-
     private final String[] cities = {"Istanbul", "Ankara", "Izmir"};
     private final int[] plateNumbers = {34, 6, 35};  // License plates for Istanbul, Ankara, Izmir
 
@@ -37,20 +35,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 sb.setMax(81);
-                int oran = android.graphics.Color.rgb(oran3, oran2, i);
                 txt.setText(String.valueOf(i));
-                oran1 = i;
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
+            public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
+            public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
         basla.setOnClickListener(new View.OnClickListener() {

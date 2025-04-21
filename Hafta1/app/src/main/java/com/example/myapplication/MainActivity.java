@@ -25,12 +25,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-//            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-//            return insets;
-//        });
-
         textView = findViewById(R.id.textView2);
 
         assignId(buttonC, R.id.buttonC);

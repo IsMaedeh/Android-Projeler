@@ -1,0 +1,102 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+
+' Define Android base classes
+abstract class AppCompatActivity {
+    + void onCreate(Bundle)
+    + boolean onTouchEvent(MotionEvent)
+    + void onDestroy()
+    + void onRequestPermissionsResult(int, String[], int[])
+}
+abstract class RecyclerViewAdapter {
+    ..generic type: <VH extends RecyclerView.ViewHolder>..
+}
+
+' MainActivity
+class MainActivity {
+    - Bitmap image
+    - String predResult
+    - int imageSize
+    - TextToSpeech textToSpeech
+    - GestureDetector gestureDetector
+    - Button btnGallery
+    - TextureView textureView
+    - PermissionManager permissionManager
+    - String[] permissions
+    - ImageCapture imgCap
+
+    # void onCreate(Bundle)
+    + void classifyImage(Bitmap)
+    # boolean onTouchEvent(MotionEvent)
+    - void speakText(String)
+    # void onDestroy()
+    # void onRequestPermissionsResult(int, String[], int[])
+    - void openCamera()
+    - void updateTransform()
+    - void clickPhoto()
+    + static void addImageToGallery(String, Context)
+}
+
+MainActivity --|> AppCompatActivity
+
+' Gallery
+class Gallery {
+    # void onCreate(Bundle)
+}
+
+Gallery --|> AppCompatActivity
+
+' Note
+class Note {
+    - String key
+    - String title
+    - String content
+
+    + String getTitle()
+    + String getContent()
+    + String getKey()
+    + void setTitle(String)
+    + void setContent(String)
+    + void setKey(String)
+}
+
+' NoteAdapter
+class NoteAdapter {
+    - Context context
+    - ArrayList<Note> arrayList
+    - OnItemClickListener onItemClickListener
+
+    + NoteAdapter(Context, ArrayList<Note>)
+    # ViewHolder onCreateViewHolder(ViewGroup, int)
+    # void onBindViewHolder(ViewHolder, int)
+    # int getItemCount()
+    + void setOnItemClickListener(OnItemClickListener)
+
+    class ViewHolder
+    interface OnItemClickListener
+}
+
+NoteAdapter --|> RecyclerViewAdapter
+NoteAdapter --> Note
+NoteAdapter --> NoteAdapter.ViewHolder
+NoteAdapter --> NoteAdapter.OnItemClickListener
+
+' PermissionManager
+class PermissionManager {
+    - static PermissionManager instance
+    - Context context
+
+    - PermissionManager()
+    + static PermissionManager getInstance(Context)
+    - void init(Context)
+    + boolean checkPermissions(String[])
+    + void askPermissions(Activity, String[], int)
+    + void handlePermissionResult(Activity, int, String[], int[])
+    - void showPermissionRational(Activity, int)
+    + void showMessageOKCancel(String, DialogInterface.OnClickListener)
+}
+
+MainActivity --> PermissionManager
+
+@enduml

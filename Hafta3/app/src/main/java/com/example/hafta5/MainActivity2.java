@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MainActivity2 extends AppCompatActivity {
-
     private ListView listView;
     private Button buttonReturn;
 
