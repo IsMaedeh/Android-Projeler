@@ -44,6 +44,7 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.tensorflow.lite.support)
     implementation(libs.tensorflow.lite.metadata)
+//    implementation(libs.linkedin.litr)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -54,14 +55,19 @@ dependencies {
     // TensorFlow Lite Bağımlılıkları
     implementation(libs.tensorflow.lite)
     implementation(libs.tensorflow.lite.task.vision)
-    implementation(libs.tensorflow.lite.support)
-    implementation(libs.tensorflow.lite.metadata)
+//    implementation(libs.tensorflow.lite.support)
+//    implementation(libs.tensorflow.lite.metadata)
 
 //    implementation(libs.glide)
 
-    implementation(libs.picasso)
+//    implementation(libs.picasso)
+
+//    implementation(libs.cloudinary)
+//    implementation(libs.okhttp)
 
     implementation(libs.cloudinary)
+    implementation(libs.litr)
+//    implementation(libs.camerax.core)
 
 
 

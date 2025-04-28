@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.camera.core.CameraX;
 import androidx.camera.core.ImageCapture;
+//import androidx.camera.core.ImageCapture.Builder;
 import androidx.camera.core.ImageCaptureConfig;
 import androidx.camera.core.Preview;
 import androidx.camera.core.PreviewConfig;
@@ -45,19 +46,30 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import android.Manifest;
 
 //import com.example.finalprojesicamerax3.ml.ModelUnquant;
+//import com.cloudinary.Cloudinary;
+//import com.cloudinary.utils.ObjectUtils;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.example.finalprojesicamerax3.ml.ModelUnquant;
 import com.example.finalprojesicamerax3.ml.ModelUnquant2;
 
@@ -148,7 +160,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
         btnGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, Gallery.class);
+                Intent intent = new Intent(MainActivity.this, Gallery2.class);
                 startActivity(intent);
             }
         });
@@ -375,7 +387,16 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
                 // Saying result
                 speakText(predResult);
 
+                // Convert the image to a byte array
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                image.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+                byte[] byteArray = byteArrayOutputStream.toByteArray();
 
+                // Upload to Cloudinary with predResult as the file name
+                String fileName = predResult + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+                uploadToCloudinary(byteArray, fileName);
+
+                // Optionally show the success message
                 //Toast.makeText(getBaseContext(), msg, Toast.LENGTH_LONG).show();
                 //addImageToGallery(file.getPath(), MainActivity.this);
             }
@@ -388,6 +409,51 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
                 Toast.makeText(getBaseContext(), msg, Toast.LENGTH_LONG).show();
                 if (cause != null) cause.printStackTrace();
 
+            }
+        });
+    }
+
+    private void uploadToCloudinary(byte[] imageBytes, String fileName) {
+        // Cloudinary configuration
+        Map<String, String> config = ObjectUtils.asMap(
+                "cloud_name", "dwsu45b3y",
+                "api_key", "954292498755932",
+                "api_secret", "jXKSRo_vlCbyXOob791iAUPBT6U"
+        );
+        Cloudinary cloudinary = new Cloudinary(config);
+
+//        try {
+//            // Upload the image
+//            Map uploadResult = cloudinary.uploader().upload(imageBytes, ObjectUtils.asMap("public_id", fileName));
+//            Log.d("Cloudinary", "Upload successful: " + uploadResult);
+//            Toast.makeText(this, "Upload successful", Toast.LENGTH_SHORT).show();
+//        } catch (Exception e) {
+//            Log.e("Cloudinary", "Upload failed", e);
+//            Toast.makeText(this, "Upload failed", Toast.LENGTH_SHORT).show();
+//        }
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    //Upload the image
+                    Map uploadResult = cloudinary.uploader().upload(imageBytes, ObjectUtils.asMap("public_id", fileName));
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.d("Cloudinary", "upload successful" + uploadResult);
+                            Toast.makeText(getApplicationContext(), "Upload successful", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } catch (Exception e) {
+                    Log.e("Cloudinary", "Upload failed", e);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "Upload failed", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             }
         });
     }
