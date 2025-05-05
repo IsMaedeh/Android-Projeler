@@ -58,9 +58,9 @@ dependencies {
 //    implementation(libs.tensorflow.lite.support)
 //    implementation(libs.tensorflow.lite.metadata)
 
-//    implementation(libs.glide)
+    implementation(libs.glide)
 
-//    implementation(libs.picasso)
+    implementation(libs.picasso)
 
 //    implementation(libs.cloudinary)
 //    implementation(libs.okhttp)

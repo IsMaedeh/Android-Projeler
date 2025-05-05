@@ -11,7 +11,7 @@ camerax = "1.0.0-alpha02"
 googleGmsGoogleServices = "4.4.2"
 firebaseDatabase = "21.0.0"
 
-#picasso = "2.71828" # or any other version you prefer
+picasso = "2.71828" # or any other version you prefer
 
 #cloudinary = "1.30.0"
 #okhttp = "4.9.0"
@@ -45,9 +45,9 @@ tensorflow-lite-task-vision = { group = "org.tensorflow", name = "tensorflow-lit
 tensorflow-lite-support = { group = "org.tensorflow", name = "tensorflow-lite-support", version.ref = "tensorflowLiteSupport" }
 tensorflow-lite-metadata = { group = "org.tensorflow", name = "tensorflow-lite-metadata", version.ref = "tensorflowLiteMetadata" }
 
-#glide = { module = "com.github.bumptech.glide:glide", version = "4.15.1" }
+glide = { module = "com.github.bumptech.glide:glide", version = "4.15.1" }
 
-#picasso = { group = "com.squareup.picasso", name = "picasso", version.ref = "picasso" }
+picasso = { group = "com.squareup.picasso", name = "picasso", version.ref = "picasso" }
 
 #cloudinary = { module = "com.cloudinary:cloudinary-android", version.ref = "cloudinary" }
 #okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }

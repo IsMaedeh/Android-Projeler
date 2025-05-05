@@ -47,7 +47,7 @@ public class Gallery2 extends AppCompatActivity {
         setContentView(R.layout.activity_gallery2);
 
         imageView = findViewById(R.id.imageView);
-        button = findViewById(R.id.button);
+//        button = findViewById(R.id.button);
         
     }
 }

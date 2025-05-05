@@ -160,7 +160,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
         btnGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, Gallery2.class);
+                Intent intent = new Intent(MainActivity.this, Gallery.class);
                 startActivity(intent);
             }
         });
