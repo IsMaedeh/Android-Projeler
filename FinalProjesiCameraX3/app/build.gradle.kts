@@ -59,6 +59,7 @@ dependencies {
 //    implementation(libs.tensorflow.lite.metadata)
 
     implementation(libs.glide)
+    annotationProcessor(libs.glide.compiler)
 
     implementation(libs.picasso)
 
@@ -69,6 +70,7 @@ dependencies {
     implementation(libs.litr)
 //    implementation(libs.camerax.core)
 
-
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
 
 }

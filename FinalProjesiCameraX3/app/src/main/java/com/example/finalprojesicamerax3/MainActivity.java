@@ -160,7 +160,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
         btnGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, Gallery.class);
+                Intent intent = new Intent(MainActivity.this, Gallery2.class);
                 startActivity(intent);
             }
         });
@@ -393,7 +393,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
                 byte[] byteArray = byteArrayOutputStream.toByteArray();
 
                 // Upload to Cloudinary with predResult as the file name
-                String fileName = predResult + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+                String fileName = predResult + " " + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
                 uploadToCloudinary(byteArray, fileName);
 
                 // Optionally show the success message
