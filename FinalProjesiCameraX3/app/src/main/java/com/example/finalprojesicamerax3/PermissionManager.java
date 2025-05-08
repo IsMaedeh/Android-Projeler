@@ -51,9 +51,9 @@ public class PermissionManager {
         if (grantResults.length > 0) {
             for (int i = 0; i < grantResults.length; i++) {
                 if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-//                    Toast.makeText(activity, "Permission granted.", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(activity, "İzin verildi.", Toast.LENGTH_SHORT).show();
                 } else {
-//                    Toast.makeText(activity, "Permission denied.", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(activity, "İzin verilmedi.", Toast.LENGTH_SHORT).show();
                 }
             }
 //            showPermissionRational(activity, requestCode);

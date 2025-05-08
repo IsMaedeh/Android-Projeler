@@ -70,13 +70,13 @@ public class Gallery extends AppCompatActivity {
                                         public void onSuccess(Void unused) {
                                             dialog.dismiss();
                                             dialogInterface.dismiss();
-                                            Toast.makeText(Gallery.this, "Saved Successfully!", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(Gallery.this, "Başarıyla Kaydedildi!", Toast.LENGTH_SHORT).show();
                                         }
                                     }).addOnFailureListener(new OnFailureListener() {
                                         @Override
                                         public void onFailure(@NonNull Exception e) {
                                             dialog.dismiss();
-                                            Toast.makeText(Gallery.this, "There was an error while saving data", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(Gallery.this, "Veri kaydedilirken bir hata oluştu", Toast.LENGTH_SHORT).show();
                                         }
                                     });
                                 }
@@ -156,13 +156,13 @@ public class Gallery extends AppCompatActivity {
                                                 public void onSuccess(Void unused) {
                                                     progressDialog.dismiss();
                                                     dialogInterface.dismiss();
-                                                    Toast.makeText(Gallery.this, "Saved Successfully!", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(Gallery.this, "Başarıyla Kaydedildi!", Toast.LENGTH_SHORT).show();
                                                 }
                                             }).addOnFailureListener(new OnFailureListener() {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
                                                     progressDialog.dismiss();
-                                                    Toast.makeText(Gallery.this, "There was an error while saving data", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(Gallery.this, "Veri kaydedilirken bir hata oluştu", Toast.LENGTH_SHORT).show();
                                                 }
                                             });
                                         }
@@ -183,7 +183,7 @@ public class Gallery extends AppCompatActivity {
                                             @Override
                                             public void onSuccess(Void unused) {
                                                 progressDialog.dismiss();
-                                                Toast.makeText(Gallery.this, "Deleted Successfully", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(Gallery.this, "Başarıyla Silindi", Toast.LENGTH_SHORT).show();
                                             }
                                         }).addOnFailureListener(new OnFailureListener() {
                                             @Override

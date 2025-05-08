@@ -1,5 +1,8 @@
 package com.example.finalprojesicamerax3;
 
+import static androidx.core.util.TypedValueCompat.dpToPx;
+
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.media.ThumbnailUtils;
@@ -34,6 +37,7 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.util.Rational;
 import android.util.Size;
+import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.Surface;
@@ -42,6 +46,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
@@ -72,7 +77,9 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.example.finalprojesicamerax3.ml.ModelUnquant;
 import com.example.finalprojesicamerax3.ml.ModelUnquant2;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
+import org.checkerframework.common.subtyping.qual.Bottom;
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
@@ -95,6 +102,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
 //    Button btnClickPhoto;
     Button btnGallery;
+//    BottomSheetBehavior<LinearLayout> bottomSheetBehavior;
     TextureView textureView;
 
     private PermissionManager permissionManager;
@@ -154,9 +162,64 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
         });
 
 //        btnClickPhoto = findViewById(R.id.btnClickPhoto);
+//        LinearLayout bottomSheet = findViewById(R.id.bottom_sheet);
         btnGallery = findViewById(R.id.btnGallery);
+//
+//        //Initialize behaviyor
+//        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
 
-        // MainActivity.java to Gallery
+//        bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+//            @Override
+//            public void onStateChanged(@androidx.annotation.NonNull View bottomSheet, int newState) {
+//                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+//                    // Set marginTop = 0
+//                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) btnGallery.getLayoutParams();
+//                    params.topMargin = 0;
+//                    btnGallery.setLayoutParams(params);
+//
+//                    // Delay and animate marginTop to -30 after 1.5 sec
+//                    btnGallery.postDelayed(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            int marginPx = myDpToPx(-30); // convert -20dp to px
+//
+//                            ValueAnimator anim = ValueAnimator.ofInt(0, marginPx);
+//                            anim.setDuration(300); // duration in milliseconds
+//                            anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//                                @Override
+//                                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+//                                    int animatedMargin = (int) valueAnimator.getAnimatedValue();
+//                                    ViewGroup.MarginLayoutParams updatedParams = (ViewGroup.MarginLayoutParams) btnGallery.getLayoutParams();
+//                                    updatedParams.topMargin = animatedMargin;
+//                                    btnGallery.setLayoutParams(updatedParams);
+//                                }
+//                            });
+//                            anim.start();
+//                        }
+//                    }, 1500); // Delay in milliseconds
+//                }
+//            }
+//
+//            @Override
+//            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+//
+//            }
+//        });
+//        // Set the peek height (how much of the button is visible when hidden)
+//        btnGallery.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                int buttonHeight = btnGallery.getHeight();
+//                // Let's make about 30% of button visible
+//                bottomSheetBehavior.setPeekHeight(buttonHeight / 3);
+//            }
+//        });
+//
+//        // Make it hideable when dragged back down
+//        bottomSheetBehavior.setHideable(false);
+
+        // Button click _ open Gallery2
+
         btnGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -185,6 +248,15 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 //                }
 //        });
     }
+
+    // Helper method to convert dp to px
+     private int myDpToPx(int dp) {
+        return (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                dp,
+                getResources().getDisplayMetrics()
+        );
+     }
 
     // Prediction : model
     @SuppressLint("DefaultLocale")
@@ -363,7 +435,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
         if (imgCap == null) {
             Log.e("CameraX", "ImageCapture is not initialized.");
-            Toast.makeText(this, "Camera is not ready yet!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Kamera henüz hazır değil!", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -373,7 +445,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
         imgCap.takePicture(file, new ImageCapture.OnImageSavedListener() {
             @Override
             public void onImageSaved(@NonNull File file) {
-                String msg = "Pic captured at " + file.getAbsolutePath();
+                String msg = "Resim çekme başarısız oldu: " + file.getAbsolutePath();
                 // Decode and display the bitmap
                 image = BitmapFactory.decodeFile(file.getPath());
 
@@ -405,7 +477,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
             public void onError(@NonNull ImageCapture.UseCaseError useCaseError,
                                 @NonNull String message,
                                 @Nullable Throwable cause) {
-                String msg = "Pic capture failed : " + message;
+                String msg = "Resim çekme başarısız oldu: " + message;
                 Toast.makeText(getBaseContext(), msg, Toast.LENGTH_LONG).show();
                 if (cause != null) cause.printStackTrace();
 
@@ -442,7 +514,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
                         @Override
                         public void run() {
                             Log.d("Cloudinary", "upload successful" + uploadResult);
-                            Toast.makeText(getApplicationContext(), "Upload successful", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Yükleme başarılı", Toast.LENGTH_SHORT).show();
                         }
                     });
                 } catch (Exception e) {
@@ -450,7 +522,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(getApplicationContext(), "Upload failed", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Yükleme başarısız oldu", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
