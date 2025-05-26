@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "694459845187",
+    "project_id": "hafta8firebase",
+    "storage_bucket": "hafta8firebase.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:694459845187:android:51c34c7ce6e7280508e2f6",
+        "android_client_info": {
+          "package_name": "com.example.hafta8"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYAEGefUyPqfvcd63m8hRR0IZToqorxfk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
