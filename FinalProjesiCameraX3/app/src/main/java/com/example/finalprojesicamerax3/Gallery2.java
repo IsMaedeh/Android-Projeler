@@ -125,11 +125,11 @@ public class Gallery2 extends AppCompatActivity {
 
     }
 
-    public void initCloudinary() {
-        Map<String, String> config = new HashMap<>();
-        config.put("cloud_name", "dwsu45b3y");  // Replace with your Cloudinary cloud name
-        config.put("api_key", "954292498755932");       // Replace with your API key
-        config.put("api_secret", "jXKSRo_vlCbyXOob791iAUPBT6U"); // Replace with your API secret
-        MediaManager.init(this, config);           // Initialize Cloudinary
-    }
+//    public void initCloudinary() {
+//        Map<String, String> config = new HashMap<>();
+//        config.put("cloud_name", "dwsu45b3y");  // Replace with your Cloudinary cloud name
+//        config.put("api_key", "954292498755932");       // Replace with your API key
+//        config.put("api_secret", "jXKSRo_vlCbyXOob791iAUPBT6U"); // Replace with your API secret
+//        MediaManager.init(this, config);           // Initialize Cloudinary
+//    }
 }

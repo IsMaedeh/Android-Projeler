@@ -7,7 +7,10 @@ appcompat = "1.7.0"
 material = "1.12.0"
 activity = "1.10.1"
 constraintlayout = "2.2.1"
-camerax = "1.0.0-alpha02"
+
+#camerax = "1.0.0-alpha02"
+camerax = "1.2.3"
+
 googleGmsGoogleServices = "4.4.2"
 firebaseDatabase = "21.0.0"
 
@@ -38,8 +41,8 @@ material = { group = "com.google.android.material", name = "material", version.r
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 
-androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "camerax" }
-androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camerax" }
+#androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "camerax" }
+#androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camerax" }
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
 
 tensorflow-lite = { group = "org.tensorflow", name = "tensorflow-lite", version.ref = "tensorflowLite" }
@@ -64,6 +67,10 @@ cloudinary = { group = "com.cloudinary", name = "cloudinary-android", version.re
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 converter_gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converter_gson" }
 
+camerax-core = { group = "androidx.camera", name = "camera-core", version.ref = "camerax" }
+camerax-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "camerax" }
+camerax-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "camerax" }
+camerax-view = { group = "androidx.camera", name = "camera-view", version.ref = "camerax" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

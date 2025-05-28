@@ -49,8 +49,12 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
-    implementation(libs.androidx.camera.core)
-    implementation(libs.androidx.camera.camera2)
+//    implementation(libs.androidx.camera.core)
+//    implementation(libs.androidx.camera.camera2)
+    implementation(libs.camerax.core)
+    implementation(libs.camerax.camera2)
+    implementation(libs.camerax.lifecycle)
+    implementation(libs.camerax.view)
 
     // TensorFlow Lite Bağımlılıkları
     implementation(libs.tensorflow.lite)

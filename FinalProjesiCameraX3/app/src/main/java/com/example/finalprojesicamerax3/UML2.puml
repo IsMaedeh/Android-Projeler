@@ -1,0 +1,146 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+
+' Define Android base classes
+abstract class AppCompatActivity {
+    + void onCreate(Bundle)
+    + boolean onTouchEvent(MotionEvent)
+    + void onDestroy()
+    + void onRequestPermissionsResult(int, String[], int[])
+}
+
+abstract class RecyclerViewAdapter {
+    ..generic type: <VH extends RecyclerView.ViewHolder>..
+}
+
+' MainActivity
+class MainActivity {
+    - Bitmap image
+    - String predResult
+    - int imageSize
+    - TextToSpeech textToSpeech
+    - GestureDetector gestureDetector
+    - Button btnGallery
+    - TextureView textureView
+    - PermissionManager permissionManager
+    - String[] permissions
+    - ImageCapture imgCap
+
+    # void onCreate(Bundle)
+    + void classifyImage(Bitmap)
+    # boolean onTouchEvent(MotionEvent)
+    - void speakText(String)
+    # void onDestroy()
+    # void onRequestPermissionsResult(int, String[], int[])
+    - void openCamera()
+    - void updateTransform()
+    - void clickPhoto()
+    - File createImageFile()
+    + Bitmap fixRotation(String, Bitmap)
+    - void uploadToCloudinary(byte[], String)
+}
+
+MainActivity --|> AppCompatActivity
+
+' Gallery2
+class Gallery2 {
+    - RecyclerView recyclerView
+    - ArrayList<ImageItem> imageList
+    - ImageAdapter imageAdapter
+
+    # void onCreate(Bundle)
+    - void fetchLast10CloudinaryImage()
+
+}
+
+Gallery2 --|> AppCompatActivity
+
+' ImageItem
+class ImageItem {
+    - String imageUrl
+    - String imageName
+
+    + ImageItem(String , String)
+    + String getImageUrl()
+    + String getImageName()
+}
+
+
+' ImageAdapter
+class ImageAdapter {
+    - Context context
+    - ArrayList<ImageItem> imageList
+
+    + ImageAdapter(Context, ArrayList<ImageItem>)
+    # ImageViewHolder onCreateViewHolder(ViewGroup, int)
+    # void onBindViewHolder(ImageViewHolder, int)
+    # int getItemCount()
+
+    class ImageViewHolder
+}
+
+ImageAdapter --|> RecyclerViewAdapter
+ImageAdapter --> ImageItem
+ImageAdapter --> ImageAdapter.ImageViewHolder
+
+
+
+' PermissionManager
+class PermissionManager {
+    - static PermissionManager instance
+    - Context context
+
+    - PermissionManager()
+    + static PermissionManager getInstance(Context)
+    - void init(Context)
+    + boolean checkPermissions(String[])
+    + void askPermissions(Activity, String[], int)
+    + void handlePermissionResult(Activity, int, String[], int[])
+    - void showPermissionRational(Activity, int)
+    + void showMessageOKCancel(String, DialogInterface.OnClickListener)
+}
+
+MainActivity --> PermissionManager
+
+
+' Interceptor Interface
+interface Interceptor {
+    + Response intercept(Chain chain)
+}
+
+
+' BasicAuthInterceptor
+class BasicAuthInterceptor {
+    - String credentials
+
+    + BasicAuthInterceptor(String, String)
+    + Response intercept(Chain)
+}
+
+BasicAuthInterceptor ..|> Interceptor
+
+
+' CloudinaryResponse
+class CloudinaryResponse {
+    - List<ImageData> resources
+
+    + List<ImageData> getResources()
+
+    class ImageData
+
+}
+
+CloudinaryResponse --> CloudinaryResponse.ImageData
+
+
+' CloudinaryApiService
+interface CloudinaryApiService {
+
+    + getImages(maxResults : int) : Call<CloudinaryResponse>
+}
+
+CloudinaryApiService --> CloudinaryResponse
+
+
+@enduml
