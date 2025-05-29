@@ -574,7 +574,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
          imageCapture.takePicture(outputFileOptions, executor, new ImageCapture.OnImageSavedCallback() {
              @Override
              public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
-                 Toast.makeText(MainActivity.this, "Photo saved: " + photoFile.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+//                 Toast.makeText(MainActivity.this, "Photo saved: " + photoFile.getAbsolutePath(), Toast.LENGTH_SHORT).show();
 
 
                  Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath);

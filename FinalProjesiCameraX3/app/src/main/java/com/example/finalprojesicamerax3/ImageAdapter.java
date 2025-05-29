@@ -1,6 +1,9 @@
 package com.example.finalprojesicamerax3;
 
+import static android.app.ProgressDialog.show;
+
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -35,9 +39,38 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
 
     @Override
     public void onBindViewHolder(ImageViewHolder holder, int position) {
-        ImageItem item = imageList.get(position);
-        Picasso.get().load(item.getImageUrl()).into(holder.imageView);
-        holder.textViewName.setText(item.getImageName());
+        ImageItem currentItem = imageList.get(position);
+
+//        Picasso ESKI
+//        Picasso.get().load(currentItem.getImageUrl()).into(holder.imageView);
+
+//        Glide YENI
+        // Load image using GLide or any library
+        Glide.with(context).load(currentItem.getImageUrl()).into(holder.imageView);
+        holder.textViewName.setText(currentItem.getImageName());
+
+        holder.itemView.setOnLongClickListener(v -> {
+            int currentPosition = holder.getAdapterPosition();
+            if (currentPosition == RecyclerView.NO_POSITION) {
+                return false; // If position is invalid, do nothing
+            }
+            ImageItem itemToDelete = imageList.get(currentPosition);
+
+            // Ask for deletion
+            new AlertDialog.Builder(context)
+                .setTitle("Fotoğraf Silmek")
+                .setMessage("Bu fotoğrafı silmek ister misin?")
+                .setPositiveButton("Evet", (dialog, which) -> {
+                    // Cal delete method in the Activity
+                    if (context instanceof Gallery2) {
+                        ((Gallery2) context).deleteImage(currentItem, position);
+                    }
+                })
+               .setNegativeButton("Hayır", null)
+               .show();
+
+            return true; // Important: Return true to consume the long-click event
+        });
     }
 
     @Override

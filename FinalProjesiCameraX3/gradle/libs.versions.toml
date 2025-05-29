@@ -32,6 +32,8 @@ cloudinary = "2.3.1"
 retrofit = "2.9.0"
 converter_gson = "2.9.0"
 
+swiperefresh  = "1.1.0"
+
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -63,14 +65,15 @@ picasso = { group = "com.squareup.picasso", name = "picasso", version.ref = "pic
 litr = { group = "com.linkedin.android.litr", name = "litr", version.ref = "litr" }
 cloudinary = { group = "com.cloudinary", name = "cloudinary-android", version.ref = "cloudinary" }
 #camerax_core = { group = "androidx.camera", name = "camera-core", version.ref = "camerax" }
-
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+
 converter_gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converter_gson" }
 
 camerax-core = { group = "androidx.camera", name = "camera-core", version.ref = "camerax" }
 camerax-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "camerax" }
 camerax-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "camerax" }
 camerax-view = { group = "androidx.camera", name = "camera-view", version.ref = "camerax" }
+swipe_refresh_layout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefresh" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
