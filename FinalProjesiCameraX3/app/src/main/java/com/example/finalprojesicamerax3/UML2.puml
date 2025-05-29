@@ -48,9 +48,17 @@ class Gallery2 {
     - RecyclerView recyclerView
     - ArrayList<ImageItem> imageList
     - ImageAdapter imageAdapter
+    - SwipeRefreshLayout swipeRefreshLayout
+    - final String cloudName
+    - final String apiKey
+    - final String apiSecret
 
     # void onCreate(Bundle)
+    - CloudinaryApiService createCloudinaryService()
     - void fetchLast10CloudinaryImage()
+    + void deleteImage(ImageItem, int)
+    - String extractPublicId(String)
+    - String generateSignature(String, long, String)
 
 }
 
@@ -133,14 +141,22 @@ class CloudinaryResponse {
 
 CloudinaryResponse --> CloudinaryResponse.ImageData
 
+' DeleteResponse
+class DeleteResponse {
+    - String result
+
+    + String getResult()
+}
 
 ' CloudinaryApiService
 interface CloudinaryApiService {
 
     + getImages(maxResults : int) : Call<CloudinaryResponse>
+    + deleteImages(publicId : String, timestamp: long, apiKey: String, signature: String) : Call<DeleteResponse>
 }
 
 CloudinaryApiService --> CloudinaryResponse
+CloudinaryApiService --> DeleteResponse
 
 
 @enduml
