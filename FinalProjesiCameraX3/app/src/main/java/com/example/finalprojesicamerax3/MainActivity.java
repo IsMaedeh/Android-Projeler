@@ -87,6 +87,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.example.finalprojesicamerax3.ml.ModelUnquant;
 import com.example.finalprojesicamerax3.ml.ModelUnquant2;
+import com.example.finalprojesicamerax3.ml.MobilModeli;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -280,10 +281,15 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
     @SuppressLint("DefaultLocale")
     public void classifyImage(Bitmap image) {
         try {
+            int totalR = 0;
+            int totalG = 0;
+            int totalB = 0;
+
+            image = image.copy(Bitmap.Config.ARGB_8888, true);
             int imageSize = 224; // Model giriş boyutuna göre ayarla
 
             // Model yükle
-            ModelUnquant model = ModelUnquant.newInstance(getApplicationContext());
+            MobilModeli model = MobilModeli.newInstance(getApplicationContext());
 
             // Bitmap boyutlandır
             Bitmap scaledImage = Bitmap.createScaledBitmap(image, imageSize, imageSize, false);
@@ -300,16 +306,47 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
             for (int i = 0; i < imageSize; i++) {
                 for (int j = 0; j < imageSize; j++) {
                     int val = intValues[pixel++];
-                    byteBuffer.putFloat(((val >> 16) & 0xFF) * (1.f / 255.f));
-                    byteBuffer.putFloat(((val >> 8) & 0xFF) * (1.f / 255.f));
-                    byteBuffer.putFloat((val & 0xFF) * (1.f / 255.f));
+
+                    int R = (val >> 16) & 0xFF;
+                    int G = (val >> 8) & 0xFF;
+                    int B = val & 0xFF;
+
+                    totalR += R;
+                    totalG += G;
+                    totalB += B;
+
+                    byteBuffer.putFloat(R * (1.f / 255.f));
+                    byteBuffer.putFloat(G * (1.f / 255.f));
+                    byteBuffer.putFloat(B * (1.f / 255.f));
+
+
+                    // girişin gerçekten RGB mi BGR mi olduğunu anlamana yardımcı olur.
+                    Log.d("PixelColor", String.format("Pixel (R,G,B): %d %d %d",
+                            ((val >> 16) & 0xFF),
+                            ((val >> 8) & 0xFF),
+                            (val & 0xFF)));
                 }
             }
+
+            // En çok olan rengi bul
+            String dominantColor;
+            int maxColorValue = Math.max(totalR, Math.max(totalG, totalB));
+            if (maxColorValue == totalR) {
+                dominantColor = "RED";
+            } else if (maxColorValue == totalG) {
+                dominantColor = "GREEN";
+            } else {
+                dominantColor = "BLUE";
+            }
+
+            Log.d("DominantColor", "RED: " + totalR + " GREEN: " + totalG + " BLUE: " + totalB);
+            Log.d("DominantColor", "Photo dominant color is: " + dominantColor);
+
 
             inputFeature0.loadBuffer(byteBuffer);
 
             // Model çalıştır
-            ModelUnquant.Outputs outputs = model.process(inputFeature0);
+            MobilModeli.Outputs outputs = model.process(inputFeature0);
             TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
 
             float[] confidences = outputFeature0.getFloatArray();
