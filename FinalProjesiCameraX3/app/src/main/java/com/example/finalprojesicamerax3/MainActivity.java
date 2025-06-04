@@ -71,6 +71,7 @@ import java.nio.ByteOrder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -85,9 +86,12 @@ import android.Manifest;
 //import com.cloudinary.utils.ObjectUtils;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.example.finalprojesicamerax3.ml.MobilModeli2;
+import com.example.finalprojesicamerax3.ml.MobilModeli3;
 import com.example.finalprojesicamerax3.ml.ModelUnquant;
 import com.example.finalprojesicamerax3.ml.ModelUnquant2;
 import com.example.finalprojesicamerax3.ml.MobilModeli;
+import com.example.finalprojesicamerax3.ml.ModelUnquant3;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -281,15 +285,15 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
     @SuppressLint("DefaultLocale")
     public void classifyImage(Bitmap image) {
         try {
-            int totalR = 0;
-            int totalG = 0;
-            int totalB = 0;
+//            int totalR = 0;
+//            int totalG = 0;
+//            int totalB = 0;
 
             image = image.copy(Bitmap.Config.ARGB_8888, true);
             int imageSize = 224; // Model giriş boyutuna göre ayarla
 
             // Model yükle
-            MobilModeli model = MobilModeli.newInstance(getApplicationContext());
+            ModelUnquant model = ModelUnquant.newInstance(getApplicationContext());
 
             // Bitmap boyutlandır
             Bitmap scaledImage = Bitmap.createScaledBitmap(image, imageSize, imageSize, false);
@@ -311,9 +315,9 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
                     int G = (val >> 8) & 0xFF;
                     int B = val & 0xFF;
 
-                    totalR += R;
-                    totalG += G;
-                    totalB += B;
+//                    totalR += R;
+//                    totalG += G;
+//                    totalB += B;
 
                     byteBuffer.putFloat(R * (1.f / 255.f));
                     byteBuffer.putFloat(G * (1.f / 255.f));
@@ -321,32 +325,32 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
 
                     // girişin gerçekten RGB mi BGR mi olduğunu anlamana yardımcı olur.
-                    Log.d("PixelColor", String.format("Pixel (R,G,B): %d %d %d",
-                            ((val >> 16) & 0xFF),
-                            ((val >> 8) & 0xFF),
-                            (val & 0xFF)));
+//                    Log.d("PixelColor", String.format("Pixel (R,G,B): %d %d %d",
+//                            ((val >> 16) & 0xFF),
+//                            ((val >> 8) & 0xFF),
+//                            (val & 0xFF)));
                 }
             }
 
-            // En çok olan rengi bul
-            String dominantColor;
-            int maxColorValue = Math.max(totalR, Math.max(totalG, totalB));
-            if (maxColorValue == totalR) {
-                dominantColor = "RED";
-            } else if (maxColorValue == totalG) {
-                dominantColor = "GREEN";
-            } else {
-                dominantColor = "BLUE";
-            }
-
-            Log.d("DominantColor", "RED: " + totalR + " GREEN: " + totalG + " BLUE: " + totalB);
-            Log.d("DominantColor", "Photo dominant color is: " + dominantColor);
+//            // En çok olan rengi bul
+//            String dominantColor;
+//            int maxColorValue = Math.max(totalR, Math.max(totalG, totalB));
+//            if (maxColorValue == totalR) {
+//                dominantColor = "RED";
+//            } else if (maxColorValue == totalG) {
+//                dominantColor = "GREEN";
+//            } else {
+//                dominantColor = "BLUE";
+//            }
+//
+//            Log.d("DominantColor", "RED: " + totalR + " GREEN: " + totalG + " BLUE: " + totalB);
+//            Log.d("DominantColor", "Photo dominant color is: " + dominantColor);
 
 
             inputFeature0.loadBuffer(byteBuffer);
 
             // Model çalıştır
-            MobilModeli.Outputs outputs = model.process(inputFeature0);
+            ModelUnquant.Outputs outputs = model.process(inputFeature0);
             TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
 
             float[] confidences = outputFeature0.getFloatArray();
@@ -629,19 +633,20 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
                  Bitmap displayBitmap = ThumbnailUtils.extractThumbnail(bitmap, dimension, dimension);
                  displayBitmap = Bitmap.createScaledBitmap(displayBitmap, imageSize, imageSize, false);
 
-                 // Modeli çalıştır
-                 classifyImage(displayBitmap);
-
-
-
-                 // Saying result
-                 speakText(predResult);
-
                  try {
                      bitmap = fixRotation(currentPhotoPath, bitmap);
+                     displayBitmap = fixRotation(currentPhotoPath, displayBitmap);
                  } catch (IOException e) {
                      throw new RuntimeException(e);
                  }
+
+                 // Classification
+                 classifyImage(displayBitmap);
+
+                 // Saying result
+                  speakText(predResult);
+
+
 
                  // Convert the image to a byte array
                  ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
