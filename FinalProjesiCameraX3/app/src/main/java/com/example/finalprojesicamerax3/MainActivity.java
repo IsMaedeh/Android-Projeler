@@ -1,16 +1,13 @@
 package com.example.finalprojesicamerax3;
 
 import static androidx.core.util.TypedValueCompat.dpToPx;
-
 import static com.bumptech.glide.load.resource.bitmap.TransformationUtils.rotateImage;
-
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
-
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
@@ -21,11 +18,8 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-// Kamera ile ilgili importlar
 import androidx.camera.core.CameraX;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCapture.Builder;
@@ -33,7 +27,6 @@ import androidx.camera.core.ImageCapture.Builder;
 import androidx.camera.core.Preview;
 //import androidx.camera.core.PreviewConfig;
 import androidx.lifecycle.LifecycleOwner;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -59,7 +52,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -78,9 +70,7 @@ import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 import android.Manifest;
-
 //import com.example.finalprojesicamerax3.ml.ModelUnquant;
 //import com.cloudinary.Cloudinary;
 //import com.cloudinary.utils.ObjectUtils;
@@ -92,65 +82,54 @@ import com.example.finalprojesicamerax3.ml.ModelUnquant;
 import com.example.finalprojesicamerax3.ml.ModelUnquant2;
 import com.example.finalprojesicamerax3.ml.MobilModeli;
 import com.example.finalprojesicamerax3.ml.ModelUnquant3;
+import com.example.finalprojesicamerax3.ml.TurkliraModelFloat16;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.common.util.concurrent.ListenableFuture;
-
 import org.checkerframework.common.subtyping.qual.Bottom;
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.support.image.TensorImage;
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
-
+// MainActivity sınıfı: Uygulamanın ana ekranı.
  public class MainActivity extends AppCompatActivity {
 
-//    //Prediction
-    Bitmap image;
-    String predResult = "Buradayim";
-    int imageSize = 224;
-//    String[] labelsArray;
-
-    // TTS
-//    Button button;
-//    EditText editText;
-//    SeekBar seekBar;
-    TextToSpeech textToSpeech;
-    GestureDetector gestureDetector;
-
-
-//    Button btnClickPhoto;
-    Button btnGallery;
-//    BottomSheetBehavior<LinearLayout> bottomSheetBehavior;
-//    TextureView textureView;
-
-     private PermissionManager permissionManager;
-    private  String[] permissions = {Manifest.permission.CAMERA,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE};
-    private  ImageCapture imgCap;
+    // Tanımlar:
+    Bitmap image;                       // Fotoğrafı saklayacak bitmap.
+    String predResult = "Buradayim";    // Öntanımlı tahmin sonucu.
+    int imageSize = 224;                // Resim boyutu (224x224) - model için.
+    TextToSpeech textToSpeech;          // Yazıyı sese çevirme motoru.
+    GestureDetector gestureDetector;    // Dokunma hareketlerini algılayıcı.
+    Button btnGallery;                  // Galeri butonu.
+    private PermissionManager permissionManager;    // İzin yöneticisi.
+    private  String[] permissions = {               // Gerekli izinler.
+            Manifest.permission.CAMERA,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+    };
+    private  ImageCapture imgCap;       // Resim çekme nesnesi (eski kullanım).
 
      // YENI KAMERA AYARI
-     private PreviewView previewView;
-     private ImageCapture imageCapture;
-     private String currentPhotoPath;  // Fotoğrafın yolu burada saklanacak
+     private PreviewView previewView;   // Kameradan canlı görüntü almak için.
+     private ImageCapture imageCapture; // Yeni kamera API'si için fotoğraf çekme nesnesi.
+     private String currentPhotoPath;  // Çekilen fotoğrafın yolu.
 
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
+        EdgeToEdge.enable(this);    // Kenardan kenara tasarım.
+        setContentView(R.layout.activity_main);         // Ekran tasarımı yükleniyor.
 
-        // TTS
-//        button = findViewById(R.id.button);
-//        editText = findViewById(R.id.edittext);
-//        seekBar = findViewById(R.id.seekbar);
 
         //TTS
+        // Text to Speech ayarlanıyor.
         textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int i) {
                 if (i == TextToSpeech.SUCCESS) {
                     int lang = textToSpeech.setLanguage(Locale.forLanguageTag("tr-TR"));;
 
+                    // Dil desteği kontrolü.
                     if (lang == TextToSpeech.LANG_MISSING_DATA || lang == TextToSpeech.LANG_NOT_SUPPORTED) {
                         Toast.makeText(MainActivity.this, "Dil desteklenmiyor", Toast.LENGTH_SHORT).show();
                     } else {
@@ -160,88 +139,18 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
             }
         });
 
-        // TTS On CLick
-//        button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                String data = editText.getText().toString();
-//
-//                float speed = (float)  seekBar.getProgress() / 50;
-//                if (speed < 0.1) speed = 0.1f;
-//                textToSpeech.setSpeechRate(speed);
-//                textToSpeech.speak(data, TextToSpeech.QUEUE_FLUSH, null);
-//            }
-//        });
 
-        // TTS GestureDetector
+        // TTS GestureDetector (Çift tıklama algılayıcı)
         gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
            @Override
            public boolean onDoubleTap(MotionEvent e) {
-
-               clickPhoto();
+               clickPhoto();    // Çift tıklamada fotoğraf çek.
                return true;
            }
         });
 
-//        btnClickPhoto = findViewById(R.id.btnClickPhoto);
-//        LinearLayout bottomSheet = findViewById(R.id.bottom_sheet);
+        // Galeri butonu tanımı ve tıklama olayı.
         btnGallery = findViewById(R.id.btnGallery);
-//
-//        //Initialize behaviyor
-//        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-
-//        bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-//            @Override
-//            public void onStateChanged(@androidx.annotation.NonNull View bottomSheet, int newState) {
-//                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-//                    // Set marginTop = 0
-//                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) btnGallery.getLayoutParams();
-//                    params.topMargin = 0;
-//                    btnGallery.setLayoutParams(params);
-//
-//                    // Delay and animate marginTop to -30 after 1.5 sec
-//                    btnGallery.postDelayed(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            int marginPx = myDpToPx(-30); // convert -20dp to px
-//
-//                            ValueAnimator anim = ValueAnimator.ofInt(0, marginPx);
-//                            anim.setDuration(300); // duration in milliseconds
-//                            anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//                                @Override
-//                                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-//                                    int animatedMargin = (int) valueAnimator.getAnimatedValue();
-//                                    ViewGroup.MarginLayoutParams updatedParams = (ViewGroup.MarginLayoutParams) btnGallery.getLayoutParams();
-//                                    updatedParams.topMargin = animatedMargin;
-//                                    btnGallery.setLayoutParams(updatedParams);
-//                                }
-//                            });
-//                            anim.start();
-//                        }
-//                    }, 1500); // Delay in milliseconds
-//                }
-//            }
-//
-//            @Override
-//            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-//
-//            }
-//        });
-//        // Set the peek height (how much of the button is visible when hidden)
-//        btnGallery.post(new Runnable() {
-//            @Override
-//            public void run() {
-//                int buttonHeight = btnGallery.getHeight();
-//                // Let's make about 30% of button visible
-//                bottomSheetBehavior.setPeekHeight(buttonHeight / 3);
-//            }
-//        });
-//
-//        // Make it hideable when dragged back down
-//        bottomSheetBehavior.setHideable(false);
-
-        // Button click _ open Gallery2
-
         btnGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -250,50 +159,34 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
             }
         });
 
+        // İzin yöneticisi başlatılıyor.
         permissionManager = PermissionManager.getInstance(this);
-        //textureView = findViewById(R.id.textureViewID );
-        previewView = findViewById(R.id.previewView);
+        previewView = findViewById(R.id.previewView);   // Kamera önizlemesi.
 
 
 
-        // Request permissions first
+        // Gerekli izinler var mı kontrol ediliyor.
         if (!permissionManager.checkPermissions(permissions)) {
             permissionManager.askPermissions(this, permissions, 100);
         } else {
-            // Permissions already granted → Open camera immediately
+            // Varsa kamerayı aç.
             openCamera();
         }
 
-//        btnClickPhoto.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                //clickPhoto();
-//                }
-//        });
     }
 
-    // Helper method to convert dp to px
-     private int myDpToPx(int dp) {
-        return (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                dp,
-                getResources().getDisplayMetrics()
-        );
-     }
-
-    // Prediction : model
+    // Verilen Bitmap tipindeki görüntüyü model giriş boyutuna göre ölçeklendirir,
+    // ön işler, TensorFlow Lite modeliyle sınıflandırır ve sonuçları alır.
     @SuppressLint("DefaultLocale")
     public void classifyImage(Bitmap image) {
         try {
-//            int totalR = 0;
-//            int totalG = 0;
-//            int totalB = 0;
-
+            // Görüntü ARGB_8888 formatına çevrilir.
             image = image.copy(Bitmap.Config.ARGB_8888, true);
+            // Modelin beklediği boyut (224x224) ayarlanır.
             int imageSize = 224; // Model giriş boyutuna göre ayarla
 
             // Model yükle
-            ModelUnquant model = ModelUnquant.newInstance(getApplicationContext());
+            ModelUnquant2 model = ModelUnquant2.newInstance(getApplicationContext());
 
             // Bitmap boyutlandır
             Bitmap scaledImage = Bitmap.createScaledBitmap(image, imageSize, imageSize, false);
@@ -306,6 +199,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
             int[] intValues = new int[imageSize * imageSize];
             scaledImage.getPixels(intValues, 0, scaledImage.getWidth(), 0, 0, scaledImage.getWidth(), scaledImage.getHeight());
 
+            // Görüntünün her pikseli RGB formatında normalize edilerek ByteBuffer içine yazılır.
             int pixel = 0;
             for (int i = 0; i < imageSize; i++) {
                 for (int j = 0; j < imageSize; j++) {
@@ -315,44 +209,21 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
                     int G = (val >> 8) & 0xFF;
                     int B = val & 0xFF;
 
-//                    totalR += R;
-//                    totalG += G;
-//                    totalB += B;
-
                     byteBuffer.putFloat(R * (1.f / 255.f));
                     byteBuffer.putFloat(G * (1.f / 255.f));
                     byteBuffer.putFloat(B * (1.f / 255.f));
 
-
-                    // girişin gerçekten RGB mi BGR mi olduğunu anlamana yardımcı olur.
-//                    Log.d("PixelColor", String.format("Pixel (R,G,B): %d %d %d",
-//                            ((val >> 16) & 0xFF),
-//                            ((val >> 8) & 0xFF),
-//                            (val & 0xFF)));
                 }
             }
-
-//            // En çok olan rengi bul
-//            String dominantColor;
-//            int maxColorValue = Math.max(totalR, Math.max(totalG, totalB));
-//            if (maxColorValue == totalR) {
-//                dominantColor = "RED";
-//            } else if (maxColorValue == totalG) {
-//                dominantColor = "GREEN";
-//            } else {
-//                dominantColor = "BLUE";
-//            }
-//
-//            Log.d("DominantColor", "RED: " + totalR + " GREEN: " + totalG + " BLUE: " + totalB);
-//            Log.d("DominantColor", "Photo dominant color is: " + dominantColor);
 
 
             inputFeature0.loadBuffer(byteBuffer);
 
             // Model çalıştır
-            ModelUnquant.Outputs outputs = model.process(inputFeature0);
+            ModelUnquant2.Outputs outputs = model.process(inputFeature0);
             TensorBuffer outputFeature0 = outputs.getOutputFeature0AsTensorBuffer();
 
+            // En yüksek olasılığa sahip sınıf belirlenir.
             float[] confidences = outputFeature0.getFloatArray();
             int maxPos = 0;
             float maxConfidence = 0;
@@ -364,16 +235,17 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
             }
 
             String[] classes = {"5 lira", "10 lira", "20 lira", "50 lira", "100 lira", "200 lira"};
+            // Tahmin sonucu predResult değişkenine atanır.
             predResult = classes[maxPos];
 
             StringBuilder s = new StringBuilder();
             for (int i = 0; i < classes.length; i++) {
                 s.append(String.format("%s: %.1f%%\n", classes[i], confidences[i] * 100));
             }
-
-            // Örnek: confidence.setText(s.toString());
+            // Olasılık değerleri loglanır.
             Log.d("ML Result", s.toString());
 
+            // Model kapatılır.
             model.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -382,22 +254,21 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
 
      // TTS
+     // Kullanıcının dokunma olaylarını yakalar ve bu olayları gestureDetector'a ileterek işlenmesini sağlar.
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        // Olay gestureDetector tarafından işlendi ise true, değilse üst sınıf işlemi çağrılır.
         return gestureDetector.onTouchEvent(event) || super.onTouchEvent(event);
     }
 
     // TTS Function to read text aloud
+    // Verilen metni cihazın Text-to-Speech (TTS) motoru kullanarak sesli olarak okur.
     private  void speakText(String data) {
-//        String data = "iki kere sayfaya bastiniz";
-//        float speed = (float) seekBar.getProgress() / 50;
-//        if (speed < 0.1) speed = 0.1f;
-//
-//        textToSpeech.setSpeechRate(speed);
         textToSpeech.speak(data, TextToSpeech.QUEUE_FLUSH, null, null);
     }
 
     // TTS
+    // Activity kapatılırken TTS kaynaklarını serbest bırakır (durdurur ve kapatır).
     @Override
     protected void onDestroy() {
         if (textToSpeech != null) {
@@ -407,11 +278,12 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
         super.onDestroy();
     }
 
-
+    // Kullanıcı izin isteğine yanıt verdiğinde çağrılır.
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                                       @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // İzin kodu 100 ise, izin sonuçları işlenir ve kamera açılır.
         if (requestCode == 100) {
             permissionManager.handlePermissionResult(MainActivity.this, 100, permissions,
                     grantResults);
@@ -420,49 +292,15 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
             openCamera();
         }
     }
-     // ESKI KAMERA AYARI
-//    private void openCamera() {
-//        if (textureView == null) {
-//            Log.e("CameraX", "TextureView is not initialized.");
-//            return;
-//        }
-//
-//        CameraX.unbindAll();
-//
-//        Rational aspectRatio = new Rational(textureView.getWidth(), textureView.getHeight());
-//        Size screen = new Size(textureView.getWidth(), textureView.getHeight());
-//
-//        PreviewConfig pConfig = new PreviewConfig.Builder()
-//                .setTargetAspectRatio(aspectRatio)
-//                .setTargetResolution(screen)
-//                .build();
-//        Preview preview = new Preview(pConfig);
-//
-//        preview.setOnPreviewOutputUpdateListener(output -> {
-//            ViewGroup parent = (ViewGroup) textureView.getParent();
-//            parent.removeView(textureView);
-//            parent.addView(textureView, 0);
-//            textureView.setSurfaceTexture(output.getSurfaceTexture());
-//            updateTransform();
-//        });
-//
-//        ImageCaptureConfig imageCaptureConfig = new ImageCaptureConfig.Builder()
-//                .setCaptureMode(ImageCapture.CaptureMode.MIN_LATENCY)
-//                .setTargetRotation(getWindowManager().getDefaultDisplay().getRotation())
-//                .build();
-//
-//        imgCap = new ImageCapture(imageCaptureConfig);
-//
-//        // Bind to lifecycle only when the camera preview is ready
-//        CameraX.bindToLifecycle(this, preview, imgCap);
-//    }
 
      // YENI KAMERA AYARI
+     // Yeni kamera API'si (CameraX) kullanılarak arka kamera açılır ve görüntü önizlemesi başlatılır.
      private void openCamera() {
-         ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
+        ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
 
          cameraProviderFuture.addListener(() -> {
              try {
+                 // CameraProvider alınır.
                  ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
 
                  // Preview tanımla
@@ -471,11 +309,6 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
 
                  // ImageCapture tanımla (yüksek çözünürlük)
                  imageCapture = new ImageCapture.Builder()
-                         // Belirli bir çözünürlük istiyorsan:
-                         // .setTargetResolution(new Size(1920, 1080))
-                         // veya aspect ratio'yu ayarla:
-                         // .setTargetAspectRatio(AspectRatio.RATIO_16_9)
-                         // Ayrıca rotasyon ayarı:
                          .setTargetRotation(getWindowManager().getDefaultDisplay().getRotation())
                          .build();
 
@@ -490,7 +323,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
                  // Önceki bindingleri kaldır
                  cameraProvider.unbindAll();
 
-                 // Yeni bindingleri ekle
+                 // Yeni bindingleri ekle (Yeni kamera bağlamaları yapılır.)
                  cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
 
              } catch (Exception e) {
@@ -499,119 +332,33 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
          }, ContextCompat.getMainExecutor(this));
      }
 
-// ESKI KAMERA AYARI
-
-//    private  void  updateTransform() {
-//        Matrix mx = new Matrix();
-//        float w = textureView.getMeasuredWidth();
-//        float h = textureView.getMeasuredHeight();
-//
-//        float cX = w / 2f;
-//        float cY = h / 2f;
-//
-//        int rotationDgr;
-//        int rotation = (int) textureView.getRotation();
-//
-//        switch (rotation) {
-//            case Surface.ROTATION_0:
-//                rotationDgr = 0;
-//                break;
-//            case  Surface.ROTATION_90:
-//                rotationDgr = 90;
-//                break;
-//            case Surface.ROTATION_180:
-//                rotationDgr = 180;
-//                break;
-//            case Surface.ROTATION_270:
-//                rotationDgr = 270;
-//                break;
-//            default:
-//                return;
-//        }
-//
-//        mx.postRotate((float) rotationDgr, cX, cY);
-//        textureView.setTransform(mx);
-//    }
-
-     // ESKI KAMERA AYARI
-
-//    private void clickPhoto() {
-//
-//        if (imgCap == null) {
-//            Log.e("CameraX", "ImageCapture is not initialized.");
-//            Toast.makeText(this, "Kamera henüz hazır değil!", Toast.LENGTH_SHORT).show();
-//            return;
-//        }
-//
-//        File file =
-//                new File(getExternalFilesDir(null), System.currentTimeMillis() + ".png");
-//
-//        imgCap.takePicture(file, new ImageCapture.OnImageSavedListener() {
-//            @Override
-//            public void onImageSaved(@NonNull File file) {
-//                String msg = "Resim çekme başarısız oldu: " + file.getAbsolutePath();
-//                // Decode and display the bitmap
-//                image = BitmapFactory.decodeFile(file.getPath());
-//
-//                // Prediction: Model
-//                int dimension = Math.min(image.getWidth(), image.getHeight());
-//                image = ThumbnailUtils.extractThumbnail(image, dimension, dimension);
-//
-//                image = Bitmap.createScaledBitmap(image, imageSize, imageSize, false);
-//                classifyImage(image);
-//
-//                // Saying result
-//                speakText(predResult);
-//
-//                // Convert the image to a byte array
-//                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//                image.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-//                byte[] byteArray = byteArrayOutputStream.toByteArray();
-//
-//                // Upload to Cloudinary with predResult as the file name
-//                String fileName = predResult + " " + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-//                uploadToCloudinary(byteArray, fileName);
-//
-//                // Optionally show the success message
-//                //Toast.makeText(getBaseContext(), msg, Toast.LENGTH_LONG).show();
-//                //addImageToGallery(file.getPath(), MainActivity.this);
-//            }
-//
-//            @Override
-//            public void onError(@NonNull ImageCapture.UseCaseError useCaseError,
-//                                @NonNull String message,
-//                                @Nullable Throwable cause) {
-//                String msg = "Resim çekme başarısız oldu: " + message;
-//                Toast.makeText(getBaseContext(), msg, Toast.LENGTH_LONG).show();
-//                if (cause != null) cause.printStackTrace();
-//
-//            }
-//        });
-//    }
-
      // YENI KAMERA AYARI
+     // Kameradan fotoğraf çeker, dosyaya kaydeder, döndürme sorunlarını giderir,
+     // resmi sınıflandırmaya gönderir ve sonucu seslendirir.
+     // Son olarak resmi Cloudinary servisine yükler.
      private void clickPhoto() {
+
 
          if (imageCapture == null) {
              Toast.makeText(this, "Camera is not ready", Toast.LENGTH_SHORT).show();
              return;
          }
 
+        // Fotoğraf dosyası oluşturulur.
          File photoFile = createImageFile(); // Bu fonksiyon currentPhotoPath'ı atamalı
          currentPhotoPath = photoFile.getAbsolutePath();
-//         File photoFile = new File(currentPhotoPath);  // Fotoğrafın kaydedildiği gerçek dosya
 
          if (!photoFile.exists()) {
              Toast.makeText(MainActivity.this, "Fotoğraf dosyası bulunamadı.", Toast.LENGTH_SHORT).show();
              return;
          }
 
-
          ImageCapture.OutputFileOptions outputFileOptions =
                  new ImageCapture.OutputFileOptions.Builder(photoFile).build();
 
-
          Executor executor = ContextCompat.getMainExecutor(this);
+
+         // Fotoğraf çekilir
          imageCapture.takePicture(outputFileOptions, executor, new ImageCapture.OnImageSavedCallback() {
              @Override
              public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
@@ -633,6 +380,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
                  Bitmap displayBitmap = ThumbnailUtils.extractThumbnail(bitmap, dimension, dimension);
                  displayBitmap = Bitmap.createScaledBitmap(displayBitmap, imageSize, imageSize, false);
 
+                 // Döndürme açısı düzeltilir.
                  try {
                      bitmap = fixRotation(currentPhotoPath, bitmap);
                      displayBitmap = fixRotation(currentPhotoPath, displayBitmap);
@@ -640,15 +388,15 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
                      throw new RuntimeException(e);
                  }
 
-                 // Classification
+                 // classifyImage() ile sınıflandırılır.
                  classifyImage(displayBitmap);
 
-                 // Saying result
+                 // Tahmin sonucu speakText() ile seslendirilir.
                   speakText(predResult);
 
 
 
-                 // Convert the image to a byte array
+                 // Fotoğraf byte dizisine çevrilip Cloudinary'ye yüklenir.
                  ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                  boolean compressed = bitmap.compress(Bitmap.CompressFormat.JPEG, 70, byteArrayOutputStream);
                  if (!compressed) {
@@ -671,6 +419,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
      }
 
      // YENI KAMERA AYARI
+     // Geçici bir fotoğraf dosyası oluşturur ve dosya yolunu döner.
      private File createImageFile() {
          File image = null;
          try {
@@ -692,6 +441,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
      }
 
     // YENI KAMERA AYARI
+    // Fotoğrafın EXIF verilerindeki oryantasyona göre resmi uygun açıda döndürür.
      public Bitmap fixRotation(String photoPath, Bitmap bitmap) throws IOException {
 
          ExifInterface exif = new ExifInterface(photoPath);
@@ -721,33 +471,28 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
          if (rotatedBitmap != bitmap) {
              bitmap.recycle();
          }
+
+         // Döndürülmüş bitmap.
          return rotatedBitmap;
      }
 
+     // Verilen byte dizisi olarak resmi Cloudinary bulut servisine yükler.
      private void uploadToCloudinary(byte[] imageBytes, String fileName) {
-        // Cloudinary configuration
+        // Cloudinary yapılandırılır.
         Map<String, String> config = ObjectUtils.asMap(
                 "cloud_name", "dwsu45b3y",
                 "api_key", "954292498755932",
                 "api_secret", "jXKSRo_vlCbyXOob791iAUPBT6U"
         );
         Cloudinary cloudinary = new Cloudinary(config);
-
-//        try {
-//            // Upload the image
-//            Map uploadResult = cloudinary.uploader().upload(imageBytes, ObjectUtils.asMap("public_id", fileName));
-//            Log.d("Cloudinary", "Upload successful: " + uploadResult);
-//            Toast.makeText(this, "Upload successful", Toast.LENGTH_SHORT).show();
-//        } catch (Exception e) {
-//            Log.e("Cloudinary", "Upload failed", e);
-//            Toast.makeText(this, "Upload failed", Toast.LENGTH_SHORT).show();
-//        }
+        // Yükleme arka planda bir iş parçacığında yapılır.
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(new Runnable() {
             @Override
             public void run() {
+                // Başarı/başarısızlık durumu kullanıcıya bildirilir.
                 try {
-                    //Upload the image
+                    // Fotoğraf yükleme
                     Map uploadResult = cloudinary.uploader().upload(imageBytes, ObjectUtils.asMap("public_id", fileName));
                     runOnUiThread(new Runnable() {
                         @Override
@@ -769,32 +514,33 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
         });
     }
 
-//    public static void addImageToGallery(final String filePath, final Context context) {
-//
-//        ContentValues values = new ContentValues();
-//
-//        values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
-//        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
-//        values.put(MediaStore.Images.Media.DISPLAY_NAME, System.currentTimeMillis() + "png");
-//        values.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyApp");
-//        //        values.put(MediaStore.MediaColumns.DATA, filePath);
-//
-//        try {
-//            // Insert image metadata into MediaStore
-//            Uri uri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-//            if (uri != null) {
-//                try (OutputStream outputStream = context.getContentResolver().openOutputStream(uri)) {
-//                    Bitmap bitmap = BitmapFactory.decodeFile(filePath);
-//                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
-//                    outputStream.flush();
-//
-//                }
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            Log.e("Gallery", "Error saving image: " + e.getMessage());
-//        }
-//        context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-//    }
+    // Dosya yolundaki resmi Android galeriye ekler.
+    public static void addImageToGallery(final String filePath, final Context context) {
+
+        // Resim için metadata oluşturur.
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+        values.put(MediaStore.Images.Media.DISPLAY_NAME, System.currentTimeMillis() + "png");
+        values.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyApp");
+        //        values.put(MediaStore.MediaColumns.DATA, filePath);
+
+        try {
+            // Insert image metadata into MediaStore (MediaStore içerik sağlayıcısına ekler ve resmi sıkıştırarak yazar.)
+            Uri uri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+            if (uri != null) {
+                try (OutputStream outputStream = context.getContentResolver().openOutputStream(uri)) {
+                    Bitmap bitmap = BitmapFactory.decodeFile(filePath);
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                    outputStream.flush();
+
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("Gallery", "Error saving image: " + e.getMessage());
+        }
+        context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+    }
 
 }

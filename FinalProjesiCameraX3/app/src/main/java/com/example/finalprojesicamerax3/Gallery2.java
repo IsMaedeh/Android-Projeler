@@ -52,13 +52,19 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/**
+ * Gallery2 Activity'si Cloudinary'den son 10 resmi çeker ve RecyclerView içinde gösterir.
+ * Ayrıca kullanıcı uzun tıklama ile resmi silebilir.
+ */
 public class Gallery2 extends AppCompatActivity {
 
+    // UI bileşenleri
     private RecyclerView recyclerView;
-    private ArrayList<ImageItem> imageList;
-    private ImageAdapter imageAdapter;
-    private SwipeRefreshLayout swipeRefreshLayout;
+    private ArrayList<ImageItem> imageList; // Resim listesi
+    private ImageAdapter imageAdapter;      // RecyclerView için adapter
+    private SwipeRefreshLayout swipeRefreshLayout;  // Yenilemek için kaydırma özelliği
 
+    // Cloudinary API bilgileri
     private static final String cloudName = "dwsu45b3y";
     private static final String apiKey = "954292498755932";
     private static final String apiSecret = "jXKSRo_vlCbyXOob791iAUPBT6U";
@@ -71,8 +77,7 @@ public class Gallery2 extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_gallery2);
 
-//        initCloudinary();  // Initialize Cloudinary
-
+        // UI bileşenlerini başlat
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
         recyclerView = findViewById(R.id.recycler_view);
         imageList = new ArrayList<>();
@@ -80,16 +85,17 @@ public class Gallery2 extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(imageAdapter);
 
-
-//      stringArrayList.add("https://res.cloudinary.com/dwsu45b3y/image/upload/v1746434360/50%20lira20250505_113920.png");
+        // Swipe refresh ile son 10 resmi yükle
+        // stringArrayList.add("https://res.cloudinary.com/dwsu45b3y/image/upload/v1746434360/50%20lira20250505_113920.png");
         swipeRefreshLayout.setOnRefreshListener(this::fetchLast10CloudinaryImage);
 
-        // Initial fetch
+        // İlk açılışta resimleri yükle
         swipeRefreshLayout.setRefreshing(true);
         fetchLast10CloudinaryImage();
 
     }
 
+    // Cloudinary API servisini oluşturur.
     private CloudinaryApiService createCloudinaryService() {
 
         OkHttpClient client = new OkHttpClient.Builder()
@@ -106,10 +112,10 @@ public class Gallery2 extends AppCompatActivity {
         return retrofit.create(CloudinaryApiService.class);
     }
 
+    //  Cloudinary API'den son 10 resmi çeker ve RecyclerView'e ekler.
     private void fetchLast10CloudinaryImage() {
         CloudinaryApiService apiService = createCloudinaryService();
         Call<CloudinaryResponse> call = apiService.getImages(10);
-
         call.enqueue(new Callback<CloudinaryResponse>() {
             @Override
             public void onResponse(Call<CloudinaryResponse> call, Response<CloudinaryResponse> response) {
@@ -125,38 +131,28 @@ public class Gallery2 extends AppCompatActivity {
                     imageList.clear(); // Clear any existing data
                     imageList.addAll(imageItems); // Add new imageItems
                     imageAdapter.notifyDataSetChanged(); //Notify adapter to update the RecyclerView
-
                     Log.d("Cloudinary", "Images fetched: " + imageItems.size());
                 } else {
                     Log.e("Cloudinary", "Images failed: " + response.code());
                 }
-
 //                Log.d("Cloudinary", new Gson().toJson(response.body()));
-
             }
-
             @Override
             public void onFailure(Call<CloudinaryResponse> call, Throwable t) {
                 Log.e("Cloudinary", "Api call failed", t);
             }
         });
-
-
     }
 
-    //To Delte Image
+    //  Seçilen resmi Cloudinary'den siler.
     public void deleteImage(ImageItem imageItem, int position) {
         // Extract the Cloudinary public ID from the image URL
         String publicId = extractPublicId(imageItem.getImageUrl());
-
         if (publicId != null) {
-
             // Create the Cloudinary service instance
             CloudinaryApiService deleteApi = createCloudinaryService();
-
             long timestamp = System.currentTimeMillis() / 1000;
             String signature = generateSignature(publicId, timestamp, apiSecret);
-
             // Call Cloudinary's delete API (POST request to /resources/image/destroy)
             deleteApi.deleteImage(publicId, timestamp, apiKey, signature).enqueue(new Callback<DeleteResponse>() {
                 @Override
@@ -173,20 +169,18 @@ public class Gallery2 extends AppCompatActivity {
                         Log.d("Delete", "Error: " + response.code());
                     }
                 }
-
                 @Override
                 public void onFailure(Call<DeleteResponse> call, Throwable t) {
                     Log.d("Delete", "Failed: " + t.getMessage());
                 }
             });
-
         } else {
             // Handle the case when publicId is null (optional)
             Toast.makeText(Gallery2.this, "Hatalı görsel URL'si.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    // Helper to get publicId from Cloiudinary URL
+    // Resmin URL'inden publicId elde eder.
     private String extractPublicId(String imageUrl) {
         try {
             Uri uri = Uri.parse(imageUrl);
@@ -200,6 +194,7 @@ public class Gallery2 extends AppCompatActivity {
         }
     }
 
+    // Cloudinary için SHA-1 imza oluşturur.
     private String generateSignature(String publicId, long timestamp, String apiSecret) {
         String data = "public_id=" + publicId + "&timestamp=" + timestamp + apiSecret;
         try {
@@ -217,12 +212,4 @@ public class Gallery2 extends AppCompatActivity {
         }
     }
 
-
-//    public void initCloudinary() {
-//        Map<String, String> config = new HashMap<>();
-//        config.put("cloud_name", "dwsu45b3y");  // Replace with your Cloudinary cloud name
-//        config.put("api_key", "954292498755932");       // Replace with your API key
-//        config.put("api_secret", "jXKSRo_vlCbyXOob791iAUPBT6U"); // Replace with your API secret
-//        MediaManager.init(this, config);           // Initialize Cloudinary
-//    }
 }

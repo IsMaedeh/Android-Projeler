@@ -6,21 +6,26 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.PermissionChecker;
-
 import android.Manifest;
+
+// Android uygulamasında kullanıcıdan izin istemek ve izin durumunu kontrol etmek için kullanılan yardımcı (utility) sınıf.
 public class PermissionManager {
 
+    // Singleton örneği
     private static PermissionManager instance = null;
+
+    // İzin kontrollerinde kullanılan uygulama context'i
     private Context context;
 
+    // Private Yapıcı Metot
     private PermissionManager() {
     }
 
+    // Singleton örneğini döner. Eğer örnek yoksa oluşturur ve context ile başlatır.
     public static  PermissionManager getInstance(Context context) {
         if (instance == null) {
             instance = new PermissionManager();
@@ -29,8 +34,12 @@ public class PermissionManager {
         return instance;
     }
 
+    // Context bilgisini sınıfa atar.
     private void init(Context context) { this.context = context; }
 
+    // Verilen izinlerin tümünün verilip verilmediğini kontrol eder.
+    //true: Tüm izinler verilmiş.
+    //false: En az bir izin verilmemiş.
     boolean checkPermissions(String[] permissions) {
         int size = permissions.length;
 
@@ -42,10 +51,12 @@ public class PermissionManager {
         return true;
     }
 
+    // İzinleri kullanıcıdan istemek için kullanılır.
     void askPermissions(Activity activity, String[] permissions, int requestCode) {
         ActivityCompat.requestPermissions(activity, permissions, requestCode);
     }
 
+    // sonrası, izinlerin verilme durumlarını kontrol eder.
     void handlePermissionResult(Activity activity, int requestCode, String[] permissions,
                                 int[] grantResults) {
         if (grantResults.length > 0) {
@@ -60,6 +71,7 @@ public class PermissionManager {
         }
     }
 
+    // Kullanıcı izin vermemişse ve sistem izin isteğini tekrar göstermeyi öneriyorsa, açıklama mesajı gösterir ve tekrar izin ister.
     private  void showPermissionRational(Activity activity, int requestCode) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
@@ -81,7 +93,7 @@ public class PermissionManager {
         }
     }
 
-
+    // Kullanıcıya basit bir onaylama kutusu (AlertDialog) gösterir.
     void showMessageOKCancel(String msg, DialogInterface.OnClickListener onClickListener) {
         new AlertDialog.Builder(context)
                 .setMessage(msg)

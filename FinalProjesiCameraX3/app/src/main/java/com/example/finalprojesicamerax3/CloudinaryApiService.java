@@ -8,12 +8,19 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
+/**
+ * Cloudinary API isteklerini tanımlayan arayüz.
+ * Retrofit kullanılarak API çağrıları yapılır.
+ */
 public interface CloudinaryApiService {
+
+    // Cloudinary'den resim listesi çeker.
     @GET("resources/image")
     Call<CloudinaryResponse> getImages(
             @Query("max_results") int maxResults
     );
 
+    // Cloudinary'den resim silme isteği gönderir.
     @FormUrlEncoded
     @POST("image/destroy")
     Call<DeleteResponse> deleteImage(

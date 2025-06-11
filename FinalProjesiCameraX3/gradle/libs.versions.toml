@@ -19,10 +19,10 @@ picasso = "2.71828" # or any other version you prefer
 #cloudinary = "1.30.0"
 #okhttp = "4.9.0"
 
-tensorflowLite = "2.9.0"
-tensorflowLiteTaskVision = "0.4.0"
-tensorflowLiteSupport = "0.4.0"
-tensorflowLiteMetadata = "0.4.0"
+tensorflowLite = "2.12.0"                 # Latest stable version
+tensorflowLiteSupport = "0.4.3"           # Compatible Support Library
+tensorflowLiteMetadata = "0.4.3"
+tensorflowLiteTaskVision = "0.4.3"
 #litrVersion = "1.5.7"
 
 litr = "1.4.9"
